@@ -1,9 +1,0 @@
-# Default ignored files
-/shelf/
-/workspace.xml
-/target/
-/build/
-
-*.jar
-*.war
-*.ear
