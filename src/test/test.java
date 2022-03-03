@@ -161,5 +161,4 @@ public class test {
 
         assertEquals(Set.of(), myGraph.getIngoingEdges("A"));
     }
-
 }
