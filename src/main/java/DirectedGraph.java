@@ -1,6 +1,4 @@
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class DirectedGraph {
     //вершина
@@ -29,14 +27,6 @@ public class DirectedGraph {
         private final Vertex end;
         private int value;
 
-        public Edge (Vertex begin, Vertex end, int value) {
-            this.begin = begin;
-            this.end = end;
-            if (value <= 0) throw new IllegalArgumentException();
-            this.value = value;
-
-        }
-
         public Edge (String begin, String end, int value) {
             this.begin = new Vertex(begin);
             this.end = new Vertex(end);
@@ -53,21 +43,21 @@ public class DirectedGraph {
         @Override
         public boolean equals(Object obj) {
             if (!(obj instanceof Edge)) return false;
-            Edge arc = (Edge) obj;
-            return value == arc.value && begin.equals(arc.begin) && end.equals(arc.end);
+            Edge edge = (Edge) obj;
+            return value == edge.value && begin.equals(edge.begin) && end.equals(edge.end);
         }
 
     }
 
     public DirectedGraph () {}
 
-    public DirectedGraph (Set<Vertex> vertexes, Set<Edge> edges) {
-        this.vertexes.addAll(vertexes);
+    public DirectedGraph (List<Vertex> vertexes, List<Edge> edges) {
+        for (Vertex vertex: vertexes) this.addVertex(vertex.name);
         for (Edge edge: edges) this.addEdge(edge.begin.name, edge.end.name, edge.value);
     }
 
-    private final HashSet <Vertex> vertexes = new HashSet<Vertex>();
-    private final HashSet <Edge> edges = new HashSet<Edge>();
+    private final List<Vertex> vertexes = new ArrayList<>();
+    private final List<Edge> edges = new ArrayList<>();
 
     //получение вершины по имени
     private Vertex getVertex(String name) {
@@ -87,33 +77,30 @@ public class DirectedGraph {
 
     //добавление вершины
     public void addVertex(String name) {
-        vertexes.add((new Vertex(name)));
+        Vertex v = new Vertex(name);
+        if (!vertexes.contains(v)) vertexes.add((new Vertex(name)));
     }
 
     //удаление вершины
     public void deleteVertex(String name) {
-        try {
-            edges.removeAll(getIngoingEdges(name));
-            edges.removeAll(getOutgoingEdges(name));
-            vertexes.remove(this.getVertex(name));
-        }
-        catch (NullPointerException e) {}
+        edges.removeAll(getIngoingEdges(name));
+        edges.removeAll(getOutgoingEdges(name));
+        vertexes.remove(this.getVertex(name));
     }
 
     //изменение имени вершины
     public void changeVertexName(String oldName, String newName) {
-        try {
-            this.getVertex(oldName).name = newName;
-        }
-        catch (NullPointerException e) {}
+        for (Edge edge: this.getOutgoingEdges(oldName)) edge.begin.name = newName;
+        for (Edge edge: this.getIngoingEdges(oldName)) edge.end.name = newName;
+        this.getVertex(oldName).name = newName;
     }
 
     //добавление дуги
     public void addEdge(String begin, String end, int value) {
-        if (!begin.equals(end) && this.getEdge(begin, end) == null){
+        if (this.getEdge(begin, end) == null){
             this.addVertex(begin);
             this.addVertex(end);
-            edges.add(new Edge(getVertex(begin), getVertex(end), value));
+            edges.add(new Edge(begin, end, value));
         }
     }
 
@@ -124,15 +111,12 @@ public class DirectedGraph {
 
     //изменение веса дуги
     public void changeEdgeValue (String begin, String end, int newValue) {
-        try {
-            if (newValue > 0) getEdge(begin, end).value = newValue;
-        }
-        catch (NullPointerException e) {}
+        if (newValue > 0) getEdge(begin, end).value = newValue;
     }
 
     //получение списка исходящих из вершины дуг по имени вершины
-    public HashSet<Edge> getOutgoingEdges (String name) {
-        HashSet<Edge> result = new HashSet<>();
+    public List<Edge> getOutgoingEdges (String name) {
+        List<Edge> result = new ArrayList<>();
         for (Edge edge: edges) {
             if (edge.begin.equals(getVertex(name))) {
                 result.add(edge);
@@ -142,8 +126,8 @@ public class DirectedGraph {
     }
 
     //получение списка входящих в вершину дуг по имени вершины
-    public HashSet<Edge> getIngoingEdges (String name) {
-        HashSet<Edge> result = new HashSet<>();
+    public List<Edge> getIngoingEdges (String name) {
+        List<Edge> result = new ArrayList<>();
         for (Edge edge: edges) {
             if (edge.end.equals(getVertex(name))) {
                 result.add(edge);
@@ -162,6 +146,18 @@ public class DirectedGraph {
         if (obj == this) return true;
         if (!(obj instanceof DirectedGraph)) return false;
         DirectedGraph graph = (DirectedGraph) obj;
-        return edges.equals(graph.edges) && vertexes.equals(graph.vertexes);
+        //return edges.equals(graph.edges) && vertexes.equals(graph.vertexes);
+        return edges.containsAll(graph.edges) && graph.edges.containsAll(edges) && vertexes.containsAll(graph.vertexes)
+                && graph.vertexes.containsAll(vertexes);
     }
+
+//    public void getVertexes() {
+//        for (Vertex v : vertexes) System.out.print(v.name + " ");
+//        System.out.println();
+//    }
+//
+//    public void getEdges() {
+//        for (Edge e : edges) System.out.println(e.begin.name + e.end.name + e.value);
+//    }
 }
+

@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import java.util.Set;
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class test {
@@ -18,9 +18,9 @@ public class test {
 
     @Test
     public void equalsEdges() {
-        DirectedGraph.Edge ab = new DirectedGraph.Edge(new DirectedGraph.Vertex("A"), new DirectedGraph.Vertex("B"), 5);
-        DirectedGraph.Edge ab1 = new DirectedGraph.Edge(new DirectedGraph.Vertex("A"), new DirectedGraph.Vertex("B"), 5);
-        DirectedGraph.Edge ac = new DirectedGraph.Edge(new DirectedGraph.Vertex("A"), new DirectedGraph.Vertex("C"), 6);
+        DirectedGraph.Edge ab = new DirectedGraph.Edge("A", "B", 5);
+        DirectedGraph.Edge ab1 = new DirectedGraph.Edge("A","B", 5);
+        DirectedGraph.Edge ac = new DirectedGraph.Edge("A", "C", 6);
 
         assertTrue(ab.equals(ab1));
         assertFalse(ab.equals(ac));
@@ -28,19 +28,19 @@ public class test {
 
     @Test
     public void equalsGraphs() {
-        DirectedGraph graph1 = new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("A", "B", 1),
+        DirectedGraph graph1 = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 1),
                 new DirectedGraph.Edge("C", "B", 2),
                 new DirectedGraph.Edge("A", "C", 3)));
 
-        DirectedGraph graph2 = new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("A", "B", 1),
+        DirectedGraph graph2 = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 1),
                 new DirectedGraph.Edge("C", "B", 2),
                 new DirectedGraph.Edge("A", "C", 3)));
 
-        DirectedGraph graph3 = new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("A", "B", 1),
+        DirectedGraph graph3 = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 1),
                 new DirectedGraph.Edge("C", "B", 2),
                 new DirectedGraph.Edge("A", "F", 3)));
 
-        DirectedGraph graph4 = new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("A", "B", 1),
+        DirectedGraph graph4 = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 1),
                 new DirectedGraph.Edge("C", "B", 2),
                 new DirectedGraph.Edge("A", "C", 1000)));
 
@@ -58,40 +58,39 @@ public class test {
         myGraph.addVertex("C");
         myGraph.addVertex("B");
 
-        assertEquals(new DirectedGraph(Set.of(new DirectedGraph.Vertex("A"),
+        assertEquals(new DirectedGraph(List.of(new DirectedGraph.Vertex("A"),
                 new DirectedGraph.Vertex("C"),
-                new DirectedGraph.Vertex("B")), Set.of()), myGraph);
+                new DirectedGraph.Vertex("B")), List.of()), myGraph);
     }
 
     @Test
     public void deleteVertex() {
-        DirectedGraph myGraph = new DirectedGraph(Set.of(new DirectedGraph.Vertex("A"),
+        DirectedGraph myGraph = new DirectedGraph(List.of(new DirectedGraph.Vertex("A"),
                 new DirectedGraph.Vertex("B"),
                 new DirectedGraph.Vertex("C")),
-                Set.of(new DirectedGraph.Edge("A", "B", 5),
+                List.of(new DirectedGraph.Edge("A", "B", 5),
                         new DirectedGraph.Edge("C", "A", 3)));
         myGraph.deleteVertex("A");
 
-        assertEquals(new DirectedGraph(Set.of(new DirectedGraph.Vertex("B"),
-                new DirectedGraph.Vertex("C")), Set.of()), myGraph);
+        assertEquals(new DirectedGraph(List.of(new DirectedGraph.Vertex("B"),
+                new DirectedGraph.Vertex("C")), List.of()), myGraph);
     }
 
     @Test
     public void changeVertexName() {
-        DirectedGraph myGraph = new DirectedGraph(Set.of(new DirectedGraph.Vertex("A"),
+        DirectedGraph myGraph = new DirectedGraph(List.of(new DirectedGraph.Vertex("A"),
                 new DirectedGraph.Vertex("B"),
                 new DirectedGraph.Vertex("C")),
-                Set.of(new DirectedGraph.Edge("A", "B", 5),
+                List.of(new DirectedGraph.Edge("A", "B", 5),
                         new DirectedGraph.Edge("C", "A", 3)));
         myGraph.changeVertexName("A", "F");
 
         DirectedGraph myGraph2 = myGraph;
-        myGraph2.changeVertexName("P", "F");
 
-        assertEquals(new DirectedGraph(Set.of(new DirectedGraph.Vertex("F"),
+        assertEquals(new DirectedGraph(List.of(new DirectedGraph.Vertex("F"),
                 new DirectedGraph.Vertex("B"),
                 new DirectedGraph.Vertex("C")),
-                Set.of(new DirectedGraph.Edge("F", "B", 5),
+                List.of(new DirectedGraph.Edge("F", "B", 5),
                         new DirectedGraph.Edge("C", "F", 3))), myGraph);
         assertEquals(myGraph, myGraph2);
     }
@@ -104,7 +103,7 @@ public class test {
         myGraph.addEdge("B", "C", 3);
         myGraph.addEdge("B", "C", 1000);
 
-        assertEquals(new DirectedGraph(Set.of(), Set.of(
+        assertEquals(new DirectedGraph(List.of(), List.of(
                 new DirectedGraph.Edge("A", "B", 1),
                 new DirectedGraph.Edge("A", "C", 2),
                 new DirectedGraph.Edge("B", "C", 3)
@@ -113,52 +112,49 @@ public class test {
 
     @Test
     public void deleteEdge() {
-        DirectedGraph myGraph = new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("A", "B", 5),
+        DirectedGraph myGraph = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 5),
                 new DirectedGraph.Edge("B", "C", 1),
                 new DirectedGraph.Edge("A", "C", 2)));
         myGraph.deleteEdge("A", "B");
 
-        assertEquals(new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("B", "C", 1),
+        assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("B", "C", 1),
                 new DirectedGraph.Edge("A", "C", 2))), myGraph);
     }
 
     @Test
     public void changeEdgeValue() {
-        DirectedGraph myGraph = new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("A", "B", 5),
+        DirectedGraph myGraph = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 5),
                 new DirectedGraph.Edge("B", "C", 1),
                 new DirectedGraph.Edge("A", "C", 2)));
         myGraph.changeEdgeValue("A", "B", 100);
 
-        DirectedGraph myGraph2 = myGraph;
-        myGraph2.changeEdgeValue("P", "H", 42);
 
-        assertEquals(new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("A", "B", 100),
+        assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 100),
                 new DirectedGraph.Edge("B", "C", 1),
                 new DirectedGraph.Edge("A", "C", 2))), myGraph);
-        assertEquals(myGraph, myGraph2);
     }
 
     @Test
     public void getOutgoingEdges() {
-        DirectedGraph myGraph = new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("A", "B", 5),
+        DirectedGraph myGraph = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 5),
                 new DirectedGraph.Edge("B", "C", 1),
                 new DirectedGraph.Edge("A", "C", 2)));
 
-        assertEquals(Set.of(new DirectedGraph.Edge("A", "B", 5),
+        assertEquals(List.of(new DirectedGraph.Edge("A", "B", 5),
                 new DirectedGraph.Edge("A", "C", 2)), myGraph.getOutgoingEdges("A"));
 
-        assertEquals(Set.of(), myGraph.getOutgoingEdges("C"));
+        assertEquals(List.of(), myGraph.getOutgoingEdges("C"));
     }
 
     @Test
     public void getIngoingEdges() {
-        DirectedGraph myGraph = new DirectedGraph(Set.of(), Set.of(new DirectedGraph.Edge("A", "B", 5),
+        DirectedGraph myGraph = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 5),
                 new DirectedGraph.Edge("B", "C", 1),
                 new DirectedGraph.Edge("A", "C", 2)));
 
-        assertEquals(Set.of(new DirectedGraph.Edge("B", "C", 1),
+        assertEquals(List.of(new DirectedGraph.Edge("B", "C", 1),
                 new DirectedGraph.Edge("A", "C", 2)), myGraph.getIngoingEdges("C"));
 
-        assertEquals(Set.of(), myGraph.getIngoingEdges("A"));
+        assertEquals(List.of(), myGraph.getIngoingEdges("A"));
     }
 }
