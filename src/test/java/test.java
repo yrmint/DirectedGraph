@@ -1,160 +1,125 @@
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class test {
+    private final DirectedGraph myGraph = new DirectedGraph();
+     @BeforeEach
+    public void beforeEach() {
+         myGraph.addEdge("a", "b", 3);
+         myGraph.addEdge("a", "c", 4);
+         myGraph.addEdge("b", "c", 5);
+     }
 
-    @Test
-    public void equalsVertexes() {
-        DirectedGraph.Vertex a = new DirectedGraph.Vertex("A");
-        DirectedGraph.Vertex a1 = new DirectedGraph.Vertex("A");
-        DirectedGraph.Vertex a2 = new DirectedGraph.Vertex("a");
-        DirectedGraph.Vertex b = new DirectedGraph.Vertex("B");
-
-        assertTrue(a.equals(a1));
-        assertFalse(a.equals(b));
-        assertFalse(a.equals(a2));
-    }
-
-    @Test
-    public void equalsEdges() {
-        DirectedGraph.Edge ab = new DirectedGraph.Edge("A", "B", 5);
-        DirectedGraph.Edge ab1 = new DirectedGraph.Edge("A","B", 5);
-        DirectedGraph.Edge ac = new DirectedGraph.Edge("A", "C", 6);
-
-        assertTrue(ab.equals(ab1));
-        assertFalse(ab.equals(ac));
-    }
-
-    @Test
-    public void equalsGraphs() {
-        DirectedGraph graph1 = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 1),
-                new DirectedGraph.Edge("C", "B", 2),
-                new DirectedGraph.Edge("A", "C", 3)));
-
-        DirectedGraph graph2 = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 1),
-                new DirectedGraph.Edge("C", "B", 2),
-                new DirectedGraph.Edge("A", "C", 3)));
-
-        DirectedGraph graph3 = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 1),
-                new DirectedGraph.Edge("C", "B", 2),
-                new DirectedGraph.Edge("A", "F", 3)));
-
-        DirectedGraph graph4 = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 1),
-                new DirectedGraph.Edge("C", "B", 2),
-                new DirectedGraph.Edge("A", "C", 1000)));
-
-        assertTrue(graph1.equals(graph2));
-        assertTrue(graph1.equals(graph1));
-        assertFalse(graph1.equals(graph3));
-        assertFalse(graph1.equals(graph4));
-    }
-
-    @Test
+     @Test
     public void addVertex() {
-        DirectedGraph myGraph = new DirectedGraph();
-        myGraph.addVertex("A");
-        myGraph.addVertex("A");
-        myGraph.addVertex("C");
-        myGraph.addVertex("B");
+         //попытка добавить вершину с именем null
+         assertThrows(IllegalArgumentException.class, () -> myGraph.addVertex(null));
 
-        assertEquals(new DirectedGraph(List.of(new DirectedGraph.Vertex("A"),
-                new DirectedGraph.Vertex("C"),
-                new DirectedGraph.Vertex("B")), List.of()), myGraph);
-    }
+         //попытка добавить уже существующую вершину
+         myGraph.addVertex("a");
+         assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("a", "b", 3),
+                 new DirectedGraph.Edge("a", "c", 4),
+                 new DirectedGraph.Edge("b", "c", 5))), myGraph);
 
-    @Test
+         //добавление несуществующей вершины
+         myGraph.addVertex("d");
+         assertEquals(new DirectedGraph(List.of(new DirectedGraph.Vertex("d")),
+                 List.of(new DirectedGraph.Edge("a", "b", 3),
+                 new DirectedGraph.Edge("a", "c", 4),
+                 new DirectedGraph.Edge("b", "c", 5))), myGraph);
+     }
+
+     @Test
     public void deleteVertex() {
-        DirectedGraph myGraph = new DirectedGraph(List.of(new DirectedGraph.Vertex("A"),
-                new DirectedGraph.Vertex("B"),
-                new DirectedGraph.Vertex("C")),
-                List.of(new DirectedGraph.Edge("A", "B", 5),
-                        new DirectedGraph.Edge("C", "A", 3)));
-        myGraph.deleteVertex("A");
+         //попытка удалить несуществующую вершину
+         assertThrows(IllegalArgumentException.class, () -> myGraph.deleteVertex("d"));
+         assertThrows(IllegalArgumentException.class, () -> myGraph.deleteVertex(null));
 
-        assertEquals(new DirectedGraph(List.of(new DirectedGraph.Vertex("B"),
-                new DirectedGraph.Vertex("C")), List.of()), myGraph);
-    }
+         //удаление существующей вершины
+         myGraph.deleteVertex("a");
+         assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("b", "c", 5))), myGraph);
+     }
 
-    @Test
+     @Test
     public void changeVertexName() {
-        DirectedGraph myGraph = new DirectedGraph(List.of(new DirectedGraph.Vertex("A"),
-                new DirectedGraph.Vertex("B"),
-                new DirectedGraph.Vertex("C")),
-                List.of(new DirectedGraph.Edge("A", "B", 5),
-                        new DirectedGraph.Edge("C", "A", 3)));
-        myGraph.changeVertexName("A", "F");
+         //попытка поменять имя несуществующей вершины
+         assertThrows(IllegalArgumentException.class, () -> myGraph.changeVertexName("d", "f"));
 
-        DirectedGraph myGraph2 = myGraph;
+         //попытка поменять имя на null
+         assertThrows(IllegalArgumentException.class, () -> myGraph.changeVertexName("a", null));
 
-        assertEquals(new DirectedGraph(List.of(new DirectedGraph.Vertex("F"),
-                new DirectedGraph.Vertex("B"),
-                new DirectedGraph.Vertex("C")),
-                List.of(new DirectedGraph.Edge("F", "B", 5),
-                        new DirectedGraph.Edge("C", "F", 3))), myGraph);
-        assertEquals(myGraph, myGraph2);
-    }
+         //попытка поменять имя на уже занятое
+         assertThrows(IllegalArgumentException.class, () -> myGraph.changeVertexName("b", "a"));
 
-    @Test
+         //изменение имени существующей вершины
+         myGraph.changeVertexName("b", "f");
+         assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("a", "f", 3),
+                 new DirectedGraph.Edge("a", "c", 4),
+                 new DirectedGraph.Edge("f", "c", 5))), myGraph);
+     }
+
+     @Test
     public void addEdge() {
-        DirectedGraph myGraph = new DirectedGraph();
-        myGraph.addEdge("A", "B", 1);
-        myGraph.addEdge("A", "C", 2);
-        myGraph.addEdge("B", "C", 3);
-        myGraph.addEdge("B", "C", 1000);
+         //попытка добавить дугу с отрицательным весом
+         assertThrows(IllegalArgumentException.class, () -> myGraph.addEdge("f", "s", -1000));
 
-        assertEquals(new DirectedGraph(List.of(), List.of(
-                new DirectedGraph.Edge("A", "B", 1),
-                new DirectedGraph.Edge("A", "C", 2),
-                new DirectedGraph.Edge("B", "C", 3)
-        )), myGraph);
-    }
+         //попытка добавить дугу с null в качестве имени начала/конца
+         assertThrows(IllegalArgumentException.class, () -> myGraph.addEdge("a", null, 1));
+         assertThrows(IllegalArgumentException.class, () -> myGraph.addEdge(null, "a", 1));
 
-    @Test
+         //добавление дуги
+         myGraph.addEdge("b", "d", 8);
+         assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("a", "b", 3),
+                 new DirectedGraph.Edge("a", "c", 4),
+                 new DirectedGraph.Edge("b", "c", 5),
+                 new DirectedGraph.Edge("b", "d", 8))), myGraph);
+
+     }
+
+     @Test
     public void deleteEdge() {
-        DirectedGraph myGraph = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 5),
-                new DirectedGraph.Edge("B", "C", 1),
-                new DirectedGraph.Edge("A", "C", 2)));
-        myGraph.deleteEdge("A", "B");
+         //попытка удалить несуществующую вершину
+         assertThrows(IllegalArgumentException.class, () -> myGraph.deleteVertex("d"));
 
-        assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("B", "C", 1),
-                new DirectedGraph.Edge("A", "C", 2))), myGraph);
-    }
+         //удаление вершины
+         myGraph.deleteVertex("a");
+         assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("b", "c", 5))), myGraph);
+     }
 
-    @Test
+     @Test
     public void changeEdgeValue() {
-        DirectedGraph myGraph = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 5),
-                new DirectedGraph.Edge("B", "C", 1),
-                new DirectedGraph.Edge("A", "C", 2)));
-        myGraph.changeEdgeValue("A", "B", 100);
+         //попытка изменить вес на отрицательный
+         assertThrows(IllegalArgumentException.class, () -> myGraph.changeEdgeValue("a", "b", -100));
 
+         //попытка изменить вес несуществующей дуги
+         assertThrows(IllegalArgumentException.class, () -> myGraph.changeEdgeValue("s", "g", 9));
 
-        assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 100),
-                new DirectedGraph.Edge("B", "C", 1),
-                new DirectedGraph.Edge("A", "C", 2))), myGraph);
-    }
+         //изменение веса
+         myGraph.changeEdgeValue("a", "b", 100);
+         assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("a", "b", 100),
+                 new DirectedGraph.Edge("a", "c", 4),
+                 new DirectedGraph.Edge("b", "c", 5))), myGraph);
+     }
 
-    @Test
+     @Test
     public void getOutgoingEdges() {
-        DirectedGraph myGraph = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 5),
-                new DirectedGraph.Edge("B", "C", 1),
-                new DirectedGraph.Edge("A", "C", 2)));
+         //попытка получить дуги из несуществующей вершины
+         assertThrows(IllegalArgumentException.class, () -> myGraph.getOutgoingEdges("d"));
 
-        assertEquals(List.of(new DirectedGraph.Edge("A", "B", 5),
-                new DirectedGraph.Edge("A", "C", 2)), myGraph.getOutgoingEdges("A"));
+         //получение списка исходящих дуг
+         assertEquals(List.of(new DirectedGraph.Edge("a", "b", 3),
+                 new DirectedGraph.Edge("a", "c", 4)), myGraph.getOutgoingEdges("a"));
+     }
 
-        assertEquals(List.of(), myGraph.getOutgoingEdges("C"));
-    }
-
-    @Test
+     @Test
     public void getIngoingEdges() {
-        DirectedGraph myGraph = new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("A", "B", 5),
-                new DirectedGraph.Edge("B", "C", 1),
-                new DirectedGraph.Edge("A", "C", 2)));
+         //попытка получить дуги в несуществующую вершину
+         assertThrows(IllegalArgumentException.class, () -> myGraph.getIngoingEdges("d"));
 
-        assertEquals(List.of(new DirectedGraph.Edge("B", "C", 1),
-                new DirectedGraph.Edge("A", "C", 2)), myGraph.getIngoingEdges("C"));
-
-        assertEquals(List.of(), myGraph.getIngoingEdges("A"));
-    }
+         //получение списка входящих дуг
+         assertEquals(List.of(new DirectedGraph.Edge("a", "c", 4),
+                 new DirectedGraph.Edge("b", "c", 5)), myGraph.getIngoingEdges("c"));
+     }
 }
