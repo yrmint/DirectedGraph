@@ -80,12 +80,13 @@ public class test {
 
      @Test
     public void deleteEdge() {
-         //попытка удалить несуществующую вершину
-         assertThrows(IllegalArgumentException.class, () -> myGraph.deleteVertex("d"));
+         //попытка удалить несуществующую дугу
+         assertThrows(IllegalArgumentException.class, () -> myGraph.deleteEdge("d", "e"));
 
-         //удаление вершины
-         myGraph.deleteVertex("a");
-         assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("b", "c", 5))), myGraph);
+         //удаление дуги
+         myGraph.deleteEdge("a", "b");
+         assertEquals(new DirectedGraph(List.of(), List.of(new DirectedGraph.Edge("a", "c", 4),
+                 new DirectedGraph.Edge("b", "c", 5))), myGraph);
      }
 
      @Test
